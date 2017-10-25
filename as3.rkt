@@ -15,4 +15,6 @@
 (define 4a (rs-read "/wav/II-a-133.wav"))
 (define 4b (rs-read "/wav/II-a-133.wav"))
 
+(define ps (make-pstream))
+
 
