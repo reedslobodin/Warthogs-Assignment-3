@@ -17,4 +17,47 @@
 
 (define ps (make-pstream))
 
+(define-struct songstate [v1a v1b v2a v2b violaa violab celloa cellob songpos])
+(define allOn (make-songstate #t #t #t #t #t #t #t #t 0))
 
+
+(define (keyhandler ss key)
+  (cond
+    [(key=? key "1")
+     (make-songstate (not (songstate-v1a ss))(songstate-v1b ss)
+                     (songstate-v2a ss)(songstate-v2b ss)(songstate-violaa ss)(songstate-violab ss)
+                     (songstate-celloa ss)(songstate-cellob ss) (songstate-songpos ss))]
+    [(key=? key "2")
+     (make-songstate (songstate-v1a ss) (not (songstate-v1b ss))
+                     (songstate-v2a ss)(songstate-v2b ss)(songstate-violaa ss)(songstate-violab ss)
+                     (songstate-celloa ss)(songstate-cellob ss)(songstate-songpos ss))]
+    [(key=? key "3")
+     (make-songstate (songstate-v1a ss)(songstate-v1b ss)
+                     (not (songstate-v2a ss))(songstate-v2b ss)(songstate-violaa ss)(songstate-violab ss)
+                     (songstate-celloa ss)(songstate-cellob ss)(songstate-songpos ss))]
+    [(key=? key "4")
+     (make-songstate (songstate-v1a ss)(songstate-v1b ss)
+                     (songstate-v2a ss)(not (songstate-v2b ss))(songstate-violaa ss)(songstate-violab ss)
+                     (songstate-celloa ss)(songstate-cellob ss)(songstate-songpos ss))]
+    [(key=? key "5")
+     (make-songstate (songstate-v1a ss)(songstate-v1b ss)
+                     (songstate-v2a ss)(songstate-v2b ss)(not (songstate-violaa ss))(songstate-violab ss)
+                     (songstate-celloa ss)(songstate-cellob ss)(songstate-songpos ss))]
+    [(key=? key "6")
+     (make-songstate (songstate-v1a ss)(songstate-v1b ss)
+                     (songstate-v2a ss)(songstate-v2b ss)(songstate-violaa ss)(not (songstate-violab ss))
+                     (songstate-celloa ss)(songstate-cellob ss)(songstate-songpos ss))]
+    [(key=? key "7")
+     (make-songstate (songstate-v1a ss)(songstate-v1b ss)
+                     (songstate-v2a ss)(songstate-v2b ss)(songstate-violaa ss)(songstate-violab ss)
+                     (not (songstate-celloa ss))(songstate-cellob ss)(songstate-songpos ss))]
+    [(key=? key "8")
+     (make-songstate (songstate-v1a ss)(songstate-v1b ss)
+                     (songstate-v2a ss)(songstate-v2b ss)(songstate-violaa ss)(songstate-violab ss)
+                     (songstate-celloa ss)(not (songstate-cellob ss))(songstate-songpos ss))]))
+
+(big-bang allOn
+          [on-tick ticker]
+          [on-key keyhandler]
+          [to-draw renderer]
+          )
