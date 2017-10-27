@@ -37,35 +37,60 @@
 
 (define (both a b) b)
 
-(define (set-volumes ss part)
+;Drawn representation of part "A" tracks
+(define A (circle 10 "solid" "black"))
+(define A-light (circle 10 "solid" "red")) ;;A tracks when playing
+
+;Drawn representation of part "B" tracks
+(define B (square 20 "solid" "black"))
+(define B-light (square 20 "solid" "red")) ;;B tracks when playing
+
+;Drawn representation of 'extra/special' sounds
+(define SFX (star 20 "solid" "black"))
+(define SFX-light (star 20 "solid" "yellow")) ;;SFX tracks when playing
+
+;Background
+(define image-BG (rectangle 300 800 "solid" "white"))
+
+
+(define (set-volume ss part)
 (cond
   [(= part 1)
-  (cond [(songstate-Ia ss)(pstream-set-volume! 1a 1/8)]
-        [else (pstream-set-volume! 1a 0)])
+  (cond [(songstate-v1a ss)(pstream-set-volume! 1a 1/8)]
+        [else (pstream-set-volume! 1a 0)])]
   [(= part 2)
-  (cond [(songstate-Ia ss)(pstream-set-volume! 1a 1/8)]
-        [else (pstream-set-volume! 1a 0)])
+  (cond [(songstate-v1b ss)(pstream-set-volume! 1b 1/8)]
+        [else (pstream-set-volume! 1b 0)])]
   [(= part 3)
-  (cond [(songstate-Ia ss)(pstream-set-volume! 1a 1/8)]
-        [else (pstream-set-volume! 1a 0)])
+  (cond [(songstate-v2a ss)(pstream-set-volume! 2a 1/8)]
+        [else (pstream-set-volume! 2a 0)])]
   [(= part 4)
-  (cond [(songstate-Ia ss)(pstream-set-volume! 1a 1/8)]
-        [else (pstream-set-volume! 1a 0)])
+  (cond [(songstate-v2b ss)(pstream-set-volume! 2b 1/8)]
+        [else (pstream-set-volume! 2b 0)])]
   [(= part 5)
-  (cond [(songstate-Ia ss)(pstream-set-volume! 1a 1/8)]
-        [else (pstream-set-volume! 1a 0)])
+  (cond [(songstate-violaa ss)(pstream-set-volume! 3a 1/8)]
+        [else (pstream-set-volume! 3a 0)])]
   [(= part 6)
-  (cond [(songstate-Ia ss)(pstream-set-volume! 1a 1/8)]
-        [else (pstream-set-volume! 1a 0)])
+  (cond [(songstate-violab ss)(pstream-set-volume! 3b 1/8)]
+        [else (pstream-set-volume! 3b 0)])]
   [(= part 7)
-  (cond [(songstate-Ia ss)(pstream-set-volume! 1a 1/8)]
-        [else (pstream-set-volume! 1a 0)])
+  (cond [(songstate-celloa ss)(pstream-set-volume! 4a 1/8)]
+        [else (pstream-set-volume! 4a 0)])]
   [(= part 8)
-  (cond [(songstate-Ia ss)(pstream-set-volume! 1a 1/8)]
-        [else (pstream-set-volume! 1a 0)])
+  (cond [(songstate-cellob ss)(pstream-set-volume! 4b 1/8)]
+        [else (pstream-set-volume! 4b 0)])]))
   
-    ;change parts to match
-
+(define (volumesetter ss)
+  (both (set-volume ss 1)
+  (both (set-volume ss 2)
+  (both (set-volume ss 3)
+  (both (set-volume ss 4)
+  (both (set-volume ss 5)
+  (both (set-volume ss 6)
+  (both (set-volume ss 7)
+   (set-volume ss 8)))))))))
+                    
+                    
 ;; is it time to play the next chunk, yet?
 (define (time-to-play? end-frame cur-frame)
   (< (- end-frame cur-frame) MAX-QUEUE-INTERVAL))
@@ -102,8 +127,40 @@
 (define-struct songstate [v1a v1b v2a v2b violaa violab celloa cellob songpos])
 (define allOn (make-songstate #t #t #t #t #t #t #t #t 0))
 
-(define (renderer bool)
-      (square 50 "solid" "green"))
+(define (draw-image ws)
+  (place-image (cond
+                 [(songstate-v1a ws) A-light] ;if state is true (song is playing), shape is red
+                 [(not (songstate-v1a ws)) A]) ;if state is false (song muted), shape is black
+               20 20
+  (place-image   (cond
+                 [(songstate-v1b ws) B-light]
+                 [(not (songstate-v1b ws)) B])
+               60 20
+  (place-image  (cond
+                 [(songstate-v2a ws) A-light]
+                 [(not (songstate-v2a ws)) A])
+               20 50
+  (place-image  (cond
+                 [(songstate-v2b ws) B-light]
+                 [(not (songstate-v2b ws)) B])
+               60 50
+  (place-image  (cond
+                 [(songstate-violaa ws) A-light]
+                 [(not (songstate-violaa ws)) A])
+               20 80
+  (place-image  (cond
+                 [(songstate-violab ws) B-light]
+                 [(not (songstate-violab ws)) B])
+               60 80
+  (place-image  (cond
+                 [(songstate-celloa ws) A-light]
+                 [(not (songstate-celloa ws)) A])
+               20 110
+  (place-image  (cond
+                 [(songstate-cellob ws) B-light]
+                 [(not (songstate-cellob ws)) B])
+               60 110 image-BG
+  )))))))))
 
 (define (ticker ss)
   (cond [(time-to-play? (songstate-songpos ss) (pstream-current-frame ps))
@@ -114,7 +171,7 @@
     ))   
 
 (define (keyhandler ss key)
-  (cond
+  (both (volumesetter ss)(cond
     [(key=? key "1")
      (make-songstate (not (songstate-v1a ss))(songstate-v1b ss)
                      (songstate-v2a ss)(songstate-v2b ss)(songstate-violaa ss)(songstate-violab ss)
@@ -144,13 +201,13 @@
                      (songstate-v2a ss)(songstate-v2b ss)(songstate-violaa ss)(songstate-violab ss)
                      (not (songstate-celloa ss))(songstate-cellob ss)(songstate-songpos ss))]
     [(key=? key "8")
-     (make-songstate (songstate-v1a ss)(songstate-v1b ss)
+    (make-songstate (songstate-v1a ss)(songstate-v1b ss)
                      (songstate-v2a ss)(songstate-v2b ss)(songstate-violaa ss)(songstate-violab ss)
-                     (songstate-celloa ss)(not (songstate-cellob ss))(songstate-songpos ss))]
-    [else ss]))
+                     (songstate-celloa ss)(not (songstate-cellob ss))(songstate-songpos ss)) ]
+    [else ss])))
 
 (big-bang allOn
           [on-tick ticker TICK-LEN]
           [on-key keyhandler]
-          [to-draw renderer]
+          [to-draw draw-image]
           )
