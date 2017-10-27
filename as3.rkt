@@ -35,6 +35,37 @@
 (pstream-set-volume! 4a 1/8)
 (pstream-set-volume! 4b 1/8)
 
+(define (both a b) b)
+
+(define (set-volumes ss part)
+(cond
+  [(= part 1)
+  (cond [(songstate-Ia ss)(pstream-set-volume! 1a 1/8)]
+        [else (pstream-set-volume! 1a 0)])
+  [(= part 2)
+  (cond [(songstate-Ia ss)(pstream-set-volume! 1a 1/8)]
+        [else (pstream-set-volume! 1a 0)])
+  [(= part 3)
+  (cond [(songstate-Ia ss)(pstream-set-volume! 1a 1/8)]
+        [else (pstream-set-volume! 1a 0)])
+  [(= part 4)
+  (cond [(songstate-Ia ss)(pstream-set-volume! 1a 1/8)]
+        [else (pstream-set-volume! 1a 0)])
+  [(= part 5)
+  (cond [(songstate-Ia ss)(pstream-set-volume! 1a 1/8)]
+        [else (pstream-set-volume! 1a 0)])
+  [(= part 6)
+  (cond [(songstate-Ia ss)(pstream-set-volume! 1a 1/8)]
+        [else (pstream-set-volume! 1a 0)])
+  [(= part 7)
+  (cond [(songstate-Ia ss)(pstream-set-volume! 1a 1/8)]
+        [else (pstream-set-volume! 1a 0)])
+  [(= part 8)
+  (cond [(songstate-Ia ss)(pstream-set-volume! 1a 1/8)]
+        [else (pstream-set-volume! 1a 0)])
+  
+    ;change parts to match
+
 ;; is it time to play the next chunk, yet?
 (define (time-to-play? end-frame cur-frame)
   (< (- end-frame cur-frame) MAX-QUEUE-INTERVAL))
@@ -48,12 +79,12 @@
 (define PLAY-SECONDS 1/20)
 ;; .. in frames?
 (define PLAY-FRAMES (* PLAY-SECONDS FRAME-RATE))
-;; queue up the next fragment
+
 (define (end-frames song-frame)
   (cond
     [(< (+ song-frame PLAY-FRAMES) (rs-frames Ia)) (+ song-frame PLAY-FRAMES)]
     [else (- (rs-frames Ia) 1)]))
-
+;; queue up the next fragment
 (define (queue-next-fragment song-frame frame-to-play val)
   (cond
     [(< song-frame (- (rs-frames Ia) PLAY-FRAMES))
