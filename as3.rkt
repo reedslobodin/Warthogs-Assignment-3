@@ -17,7 +17,7 @@
 (define IIIb (rs-read "C:/Users/Reed/Documents/GitHub/Warthogs-Assignment-3/wav/III-b-133.wav"))
 (define IVb (rs-read "C:/Users/Reed/Documents/GitHub/Warthogs-Assignment-3/wav/IV-b-133.wav"))
 
-(define ps (make-pstream))
+;;make a pstream for every part
 (define 1a (make-pstream))
 (define 1b (make-pstream))
 (define 2a (make-pstream))
@@ -26,6 +26,8 @@
 (define 3b (make-pstream))
 (define 4a (make-pstream))
 (define 4b (make-pstream))
+;;set default volumes for each stream to 1/8
+;;to eliminate crackling
 (pstream-set-volume! 1a 1/8)
 (pstream-set-volume! 1b 1/8)
 (pstream-set-volume! 2a 1/8)
@@ -35,6 +37,9 @@
 (pstream-set-volume! 4a 1/8)
 (pstream-set-volume! 4b 1/8)
 
+
+;;cheesy bit of code to do two things with one function
+;;taken from sleep-dj
 (define (both a b) b)
 
 ;Drawn representation of part "A" tracks
@@ -52,7 +57,7 @@
 ;Background
 (define image-BG (rectangle 300 800 "solid" "white"))
 
-
+;;sets volumes for the pstreams for specific parts
 (define (set-volume ss part)
 (cond
   [(= part 1)
@@ -79,7 +84,10 @@
   [(= part 8)
   (cond [(songstate-cellob ss)(pstream-set-volume! 4b 1/8)]
         [else (pstream-set-volume! 4b 0)])]))
-  
+
+
+;set the volumes of all the pstreams for all the parts to what they should be
+;based on their states
 (define (volumesetter ss)
   (both (set-volume ss 1)
   (both (set-volume ss 2)
@@ -90,25 +98,29 @@
   (both (set-volume ss 7)
    (set-volume ss 8)))))))))
                     
-                    
+;; taken from sleepy-dj                   
 ;; is it time to play the next chunk, yet?
 (define (time-to-play? end-frame cur-frame)
   (< (- end-frame cur-frame) MAX-QUEUE-INTERVAL))
-
+;;taken from sleepy-dj
 ;; how long should the big-bang ticks be?
 (define TICK-LEN 1/40)
+;;taken from sleepy-dj
 ;; the longest lead time for which we'll queue the next sound
 (define MAX-QUEUE-INTERVAL (* 3/80 FRAME-RATE))
-
+;;taken from sleepy-dj
 ;; how long should each queued segment be, in seconds?
 (define PLAY-SECONDS 1/20)
+;;taken from sleepy-dj
 ;; .. in frames?
 (define PLAY-FRAMES (* PLAY-SECONDS FRAME-RATE))
-
+;determines whether to queue a new section if too close to the end
+;frame --> boolean
 (define (end-frames song-frame)
   (cond
     [(< (+ song-frame PLAY-FRAMES) (rs-frames Ia)) (+ song-frame PLAY-FRAMES)]
     [else (- (rs-frames Ia) 1)]))
+;; taken from sleepy-dj and then modified to queue 8 pstreams
 ;; queue up the next fragment
 (define (queue-next-fragment song-frame frame-to-play val)
   (cond
@@ -123,8 +135,11 @@
                                                                         (andqueue 4b (clip IVb song-frame (end-frames song-frame))frame-to-play val))))))))]
     [else val]
   ))
-
+;;songstate
+;;boolean for each part determining whether it is played or not
+;;a songposition in frames
 (define-struct songstate [v1a v1b v2a v2b violaa violab celloa cellob songpos])
+;;start with all parts on at frame 0
 (define allOn (make-songstate #t #t #t #t #t #t #t #t 0))
 
 (define (draw-image ws)
@@ -163,14 +178,17 @@
   )))))))))
 
 (define (ticker ss)
-  (cond [(time-to-play? (songstate-songpos ss) (pstream-current-frame ps))
+  (cond [(time-to-play? (songstate-songpos ss) (pstream-current-frame 1a))
   (queue-next-fragment (songstate-songpos ss) (+ (songstate-songpos ss) PLAY-FRAMES) (make-songstate (songstate-v1a ss)(songstate-v1b ss)
                      (songstate-v2a ss)(songstate-v2b ss)(songstate-violaa ss)(songstate-violab ss)
                      (songstate-celloa ss)(songstate-cellob ss) (+ (songstate-songpos ss) PLAY-FRAMES)))]
         [else ss]
     ))   
-
+;handles an on-key event
+;from the keys 1-9
+;World State event --> World State
 (define (keyhandler ss key)
+  ;;set volumes for the streams and handle key presses
   (both (volumesetter ss)(cond
     [(key=? key "1")
      (make-songstate (not (songstate-v1a ss))(songstate-v1b ss)
@@ -204,7 +222,46 @@
     (make-songstate (songstate-v1a ss)(songstate-v1b ss)
                      (songstate-v2a ss)(songstate-v2b ss)(songstate-violaa ss)(songstate-violab ss)
                      (songstate-celloa ss)(not (songstate-cellob ss))(songstate-songpos ss)) ]
+    [(key=? key "a")
+    (make-songstate #t #f #f #f #f #f #f #f(songstate-songpos ss)) ]
+    [(key=? key "s")
+    (make-songstate #f #t #f #f #f #f #f #f(songstate-songpos ss)) ]
+    [(key=? key "d")
+    (make-songstate #f #f #t #f #f #f #f #f(songstate-songpos ss)) ]
+    [(key=? key "f")
+    (make-songstate #f #f #f #t #f #f #f #f(songstate-songpos ss)) ]
+    [(key=? key "g")
+    (make-songstate #f #f #f #f #t #f #f #f(songstate-songpos ss)) ]
+    [(key=? key "h")
+    (make-songstate #f #f #f #f #f #t #f #f(songstate-songpos ss)) ]
+    [(key=? key "j")
+    (make-songstate #f #f #f #f #f #f #t #f(songstate-songpos ss)) ]
+    [(key=? key "k")
+    (make-songstate #f #f #f #f #f #f #f #t(songstate-songpos ss)) ]
+    
     [else ss])))
+;;all streams muted
+(define all-mute
+  (make-songstate #f #f #f #f #f #f #f #f 0))
+;;testing keyhandler
+(check-expect (keyhandler allOn "1")
+              (make-songstate #f #t #t #t #t #t #t #t 0))
+(check-expect (keyhandler all-mute "2")
+              (make-songstate #f #t #f #f #f #f #f #f 0))
+(check-expect (keyhandler allOn "3")
+              (make-songstate #t #t #f #t #t #t #t #t 0))
+(check-expect (keyhandler allOn "4")
+              (make-songstate #t #t #t #f #t #t #t #t 0))
+(check-expect (keyhandler allOn "5")
+              (make-songstate #t #t #t #t #f #t #t #t 0))
+(check-expect (keyhandler allOn "6")
+              (make-songstate #t #t #t #t #t #f #t #t 0))
+(check-expect (keyhandler allOn "7")
+              (make-songstate #t #t #t #t #t #t #f #t 0))
+(check-expect (keyhandler allOn "8")
+              (make-songstate #t #t #t #t #t #t #t #f 0))
+(check-expect (keyhandler allOn "9")
+              (make-songstate #t #t #t #t #t #t #t #t 0))
 
 (big-bang allOn
           [on-tick ticker TICK-LEN]
