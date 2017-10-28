@@ -6,16 +6,16 @@
 (require 2htdp/universe)
 (require rsound)
 
-(define Ia (rs-read "C:/Users/Reed/Documents/GitHub/Warthogs-Assignment-3/wav/I-a-133.wav"))
-(define IIa (rs-read "C:/Users/Reed/Documents/GitHub/Warthogs-Assignment-3/wav/II-a-133.wav"))
+(define Ia (rs-read "wav/I-a-133.wav"))
+(define IIa (rs-read "wav/II-a-133.wav"))
 
-(define IIIa (resample .5 (rs-read "C:/Users/Reed/Documents/GitHub/Warthogs-Assignment-3/wav/III-a-133.wav")))
+(define IIIa (resample .5 (rs-read "wav/III-a-133.wav")))
 
-(define IVa(rs-read "C:/Users/Reed/Documents/GitHub/Warthogs-Assignment-3/wav/IV-a-133.wav"))
-(define Ib (rs-read "C:/Users/Reed/Documents/GitHub/Warthogs-Assignment-3/wav/I-b-133.wav"))
-(define IIb (rs-read "C:/Users/Reed/Documents/GitHub/Warthogs-Assignment-3/wav/II-b-133.wav"))
-(define IIIb (rs-read "C:/Users/Reed/Documents/GitHub/Warthogs-Assignment-3/wav/III-b-133.wav"))
-(define IVb (rs-read "C:/Users/Reed/Documents/GitHub/Warthogs-Assignment-3/wav/IV-b-133.wav"))
+(define IVa(rs-read "wav/IV-a-133.wav"))
+(define Ib (rs-read "wav/I-b-133.wav"))
+(define IIb (rs-read "wav/II-b-133.wav"))
+(define IIIb (rs-read "wav/III-b-133.wav"))
+(define IVb (rs-read "wav/IV-b-133.wav"))
 
 ;;make a pstream for every part
 (define 1a (make-pstream))
