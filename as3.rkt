@@ -268,3 +268,22 @@
           [on-key keyhandler]
           [to-draw draw-image]
           )
+
+; ASSIGNMENT 3 PARAGRAPH WRITE UP
+
+; Our process was actually quite simple. We first would define each piece of music as an rsound. Then
+; we made a pstream for each set of sounds 1-4 A&B. We then would make sure the volume was low, 1/8 scale
+; for each, so the volume wouldn't cause the sound wave to relapse and cause issues. We then made a structure
+; songstate that would contain 8 booleans, 1 for each file, and the last being a number representing the song
+; position. Then we used a 2*4 grid of triangles to show when each song is playing based on the color of the
+; triangle and the keyhandler inputs the pressing of the keys 1-8 to turn on and off the different parts
+; of the song 1-4 A&B. We then would use the ticker inorder to manipulate the pstream and makesure the
+; song postions lined up with eachother, and would then make songstates for each part of the quarter, A&B.
+; And if the song postion doesn't change then it just returns the same songstate ss. Then we created the
+; time-to-play? fuction which determines whether it is time to play the next chunk yet or not?
+; We then defined the ticks to be 1/40, with a max lead time for queueing the next sound at 3/80 * whatever
+; our framerate is. We then defined each segment to be 1/20 of a second long, and then also made a function to
+; determine the frames as well. Our next piee of code would then queue up the next fragment up so the pstream
+; in order to make it smoother than a big-bang sound play. We then added the big-bang to bring it all together.
+; We would end our code with a volume setter in order to make sure the volume went from 1/8 to 0 when keys were
+; pressed for each part 1-8. We hope you enjoy our Assignment 3!
